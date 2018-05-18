@@ -1,6 +1,7 @@
 from __future__ import print_function
 import random
 import string
+import sys
 
 WORDLIST_FILENAME = 'words.txt'
 ATTEMPTS = 8
@@ -43,9 +44,12 @@ class Hangman(object):
         line = in_file.readline()
         # wordlist: list of strings
         wordlist = line.split()
-        print('  ', len(wordlist), 'words loaded.')
-
-        return self.choice_word(wordlist)
+        if len(wordlist) == 0:
+            print('The file of words is empty')
+            sys.exit(0)
+        else:
+            print('  ', len(wordlist), 'words loaded.')
+            return self.choice_word(wordlist)
 
     def intro(self):
         '''
@@ -95,7 +99,7 @@ class Hangman(object):
 
     def get_guessed_word(self):
         '''
-        Get the letters guessed than was in the secret word
+        Get the letters guessed that was in the secret word
         '''
         guessed = ''
         for letter in self.secret_word:
@@ -106,32 +110,74 @@ class Hangman(object):
 
         return guessed
 
+    def is_letter(self, letter):
+        '''
+        Validate if the content of string is a letter
+        '''
+        try:
+            int(letter)
+            print('\nThe letter can\'t be a number !\n')
+            return False
+        except ValueError:
+            return True
+
+    def len_of_one(self, letter):
+        '''
+        Validate if the len of letter is one
+        '''
+        if len(letter) == 1:
+            return True
+        elif len(letter) == 0:
+            print('\nNo letter guessed\n')
+            return False
+        else:
+            print('\nCan\'t guess more than one letter\n')
+            return False
+        
+    def validate_letter(self, letter):
+        '''
+        Call the sub validations methods (is_letter and len_of_one)
+        '''
+        if self.is_letter(letter):
+            return self.len_of_one(letter)
+        else:
+            return False
+        
     def read_letter_guessed(self):
         '''
         Read the input (letter guessed) in python 2.x and 3.x
         '''
-        print('Please guess a letter: ', end='')
-        try: 
-            letter = raw_input()
-        except NameError:
-            letter = input()
-            pass
-        
+        while True:
+            print('Please guess a letter: ', end='')
+            try: 
+                letter = raw_input().lower()
+            except NameError:
+                letter = input().lower()
+                pass
+            
+            if self.validate_letter(letter):
+                break
+
         self.verify_letter_guessed(letter)
-        
 
     def verify_letter_guessed(self, letter):
         '''
         Verify if the input was already guessed, the correct letter
         or the incorrent letter
         '''
+        try:
+            assert isinstance(letter, str) and len(letter) == 1
+        except AssertionError:
+            print('The letter has to be string and len of 1')
+            sys.exit(0)
+        
         if letter in self.letters_guessed:
             guessed = self.get_guessed_word()
             print('Oops! You have already guessed that letter:', guessed)
         elif letter in self.secret_word:
             self.letters_guessed.append(letter)
             guessed = self.get_guessed_word()
-            print('Good Guess:', guessed)
+            print('\nGood Guess:', guessed)
         else:
             self.guesses -= 1
             self.letters_guessed.append(letter)
