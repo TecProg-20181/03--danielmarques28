@@ -24,6 +24,8 @@ class Hangman(object):
         '''
         Choice a ramdom word of wordlist
         '''
+        assert not (wordlist is None)
+
         while True:
             secret_word = random.choice(wordlist).lower()
             if self.different_letters() <= ATTEMPTS:
@@ -91,6 +93,8 @@ class Hangman(object):
         '''
         Get the letters that still available to guess
         '''
+        assert not (available is None)
+
         for letter in available:
             if letter in self.letters_guessed:
                 available = available.replace(letter, '')
@@ -114,6 +118,8 @@ class Hangman(object):
         '''
         Validate if the content of string is a letter
         '''
+        assert not (letter is None)
+
         try:
             int(letter)
             print('\nThe letter can\'t be a number !\n')
@@ -125,6 +131,8 @@ class Hangman(object):
         '''
         Validate if the len of letter is one
         '''
+        assert not (letter is None)
+        
         if len(letter) == 1:
             return True
         elif len(letter) == 0:
@@ -138,6 +146,8 @@ class Hangman(object):
         '''
         Call the sub validations methods (is_letter and len_of_one)
         '''
+        assert not (letter is None)
+        
         if self.is_letter(letter):
             return self.len_of_one(letter)
         else:
@@ -165,11 +175,9 @@ class Hangman(object):
         Verify if the input was already guessed, the correct letter
         or the incorrent letter
         '''
-        try:
-            assert isinstance(letter, str) and len(letter) == 1
-        except AssertionError:
-            print('The letter has to be string and len of 1')
-            sys.exit(0)
+        assert not (letter is None)
+        assert isinstance(letter, str)
+        assert len(letter) == 1
         
         if letter in self.letters_guessed:
             guessed = self.get_guessed_word()
